@@ -10,7 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TodoBlazorElectron.Context;
 using TodoBlazorElectron.Data;
+using TodoBlazorElectron.Services;
 
 namespace TodoBlazorElectron
 {
@@ -30,6 +32,8 @@ namespace TodoBlazorElectron
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddMudServices();
+            services.AddSingleton<LiteDBContext, LiteDBContext>();
+            services.AddScoped<IToDoSvc, ToDoSvc>();
             services.AddSingleton<WeatherForecastService>();
         }
 

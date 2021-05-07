@@ -1,7 +1,11 @@
 ﻿@page "/"
 
 @using TodoBlazorElectron.Entities;
-@using LiteDB;
+
+@using TodoBlazorElectron.Services
+@inject IToDoSvc ToDoSvc
+
+@inject IDialogService DialogService
 @*<SurveyPrompt Title="How is Blazor working for you?" />*@
 
 <MudText Typo="Typo.h6">MudBlazor is </MudText>
@@ -40,13 +44,17 @@ asd
     </MudSelect>
 </MudItem>
 
+<MudButton @onclick="OpenDialog" Variant="Variant.Filled" Color="Color.Primary">
+    Open Simple Dialog
+</MudButton>
+
 @code {
 
     Dictionary<int, string> PriorityList = new()
     {
-            { 1, "High" },
-            { 2, "Medium" }
-        };
+        { 1, "High" },
+        { 2, "Medium" }
+    };
 
     List<ToDo> todoList { get; set; }
 
@@ -61,9 +69,7 @@ asd
 
     List<ToDo> GetAllTodos()
     {
-        using var db = new LiteDatabase(@"MyData.db");
-
-        var todos = db.GetCollection<ToDo>("todos").FindAll().ToList();
+        var todos = ToDoSvc.Get();
 
         return todos;
     }
@@ -72,20 +78,19 @@ asd
     {
         date = date.Value.AddDays(2);
 
-        using var db = new LiteDatabase(@"MyData.db");
-
-        var todos = db.GetCollection<ToDo>("todos");
-
-        var todo = new ToDo
+        ToDoSvc.Add(new ToDo
         {
             Description = TextValue,
             Deadline = date
-        };
+        });
+    }
 
-        todos.Insert(todo);
-
-        var results = todos.Find(x => x.CreatedAt > new DateTime(2020, 01, 01));
-
-
+    private void OpenDialog()
+    {
+        DialogService.Show<UpsertToDo>("Add/Edit To-Do", new DialogOptions
+        {
+            FullWidth = true,
+            MaxWidth = MaxWidth.Small
+        });
     }
 }
