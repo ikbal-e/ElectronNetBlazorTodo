@@ -1,8 +1,11 @@
 ﻿@page "/"
+
+@using TodoBlazorElectron.Entities;
+@using LiteDB;
 @*<SurveyPrompt Title="How is Blazor working for you?" />*@
 
 <MudText Typo="Typo.h6">MudBlazor is </MudText>
-<MudButton Variant="Variant.Filled" Color="Color.Primary">Texttttttfffdtftt</MudButton>
+<MudButton Variant="Variant.Filled" Color="Color.Primary">Textttttatfffdtftt</MudButton>
 
 <MudItem xs="12" sm="6" md="4">
     <MudDatePicker Label="Finish until" @bind-Date="date" DisableToolbar="true" />
@@ -19,6 +22,11 @@
     </MudItem>
 </MudGrid>
 
+@foreach (var todo in todoList)
+{
+    <li>@todo.Description - @todo.CreatedAt</li>
+}
+asd
 <MudItem xs="12" sm="6" md="4">
     <MudSelect T="int" @bind-Value="@SelectedPriority" Label="Priotiy">
         @foreach (var priority in PriorityList)
@@ -38,14 +46,46 @@
     {
             { 1, "High" },
             { 2, "Medium" }
-    };
+        };
+
+    List<ToDo> todoList { get; set; }
 
     public int SelectedPriority { get; set; } = 1;
     DateTime? date = DateTime.Now;
     public string TextValue { get; set; }
 
+    protected override async Task OnInitializedAsync()
+    {
+        todoList = GetAllTodos();
+    }
+
+    List<ToDo> GetAllTodos()
+    {
+        using var db = new LiteDatabase(@"MyData.db");
+
+        var todos = db.GetCollection<ToDo>("todos").FindAll().ToList();
+
+        return todos;
+    }
+
     async Task Add()
     {
         date = date.Value.AddDays(2);
+
+        using var db = new LiteDatabase(@"MyData.db");
+
+        var todos = db.GetCollection<ToDo>("todos");
+
+        var todo = new ToDo
+        {
+            Description = TextValue,
+            Deadline = date
+        };
+
+        todos.Insert(todo);
+
+        var results = todos.Find(x => x.CreatedAt > new DateTime(2020, 01, 01));
+
+
     }
 }
