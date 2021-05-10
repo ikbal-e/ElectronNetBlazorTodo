@@ -14,5 +14,11 @@ namespace TodoBlazorElectron.Context
             var db = new LiteDatabase(@"ToDoData.db");
             Context = db;
         }
+
+        public LiteDBContext(string fileName)
+        {
+            var db = new LiteDatabase(@$"{fileName}.db");
+            Context = db;
+        }
     }
 }

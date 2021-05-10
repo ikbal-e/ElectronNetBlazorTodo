@@ -32,10 +32,10 @@ namespace TodoBlazorElectron.Services
         public List<ToDo> Get(Expression<Func<ToDo, bool>> predicate = null)
         {
             var todos = predicate is null 
-                ?_liteDb.GetCollection<ToDo>("todos").FindAll().ToList()
-                :_liteDb.GetCollection<ToDo>("todos").Find(predicate).ToList();
+                ?_liteDb.GetCollection<ToDo>("todos").FindAll()
+                :_liteDb.GetCollection<ToDo>("todos").Find(predicate);
 
-            return todos;
+            return todos.ToList();
         }
     }
 }
